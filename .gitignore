@@ -1,5 +1,5 @@
-# Files
 **/.DS_Store
+**/classes
 **/*~
 **/.*
 **/workspace
@@ -9,3 +9,4 @@
 **/.settings
 **/build
 **/bin
+**/nbproject
