@@ -133,7 +133,7 @@ public class VolVisApplication extends javax.swing.JFrame {
 
     private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
         // TODO add your handling code here:
-        String myPath = "C:\\Users\\20175484\\Desktop\\Uni\\Courses\\Q2\\Visualization\\Assingment 1\\set1_data";
+        String myPath = "/Users/gomerudo/Documents/Master/quartile2/2IMV20/assignment1/set1_data";
         JFileChooser fc = new JFileChooser(myPath);
         fc.setFileFilter(new FileFilter() {
 
