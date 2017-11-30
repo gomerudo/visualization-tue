@@ -197,7 +197,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                 
                 for (int t = 0; t <= nSlices ;t++ ){
                     double zValue = t * ((double)volume.getDimZ()/2) / (double) nSlices ; //double nslices cause math
-                    
+                
                     pixelCoord[0] = uVec[0] * (i - imageCenter) + vVec[0] * (j - imageCenter)
                         + volumeCenter[0];
                      pixelCoord[1] = uVec[1] * (i - imageCenter) + vVec[1] * (j - imageCenter)
