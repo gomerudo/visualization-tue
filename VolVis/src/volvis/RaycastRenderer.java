@@ -56,7 +56,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         tFunc = new TransferFunction(volume.getMinimum(), volume.getMaximum());
         
         // uncomment this to initialize the TF with good starting values for the orange dataset 
-        //tFunc.setTestFunc();
+        tFunc.setTestFunc();
         
         
         tFunc.addTFChangeListener(this);
@@ -143,7 +143,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                 voxelColor.b = voxelColor.r;
                 voxelColor.a = val > 0 ? 1.0 : 0.0;  // this makes intensity 0 completely transparent and the rest opaque
                 // Alternatively, apply the transfer function to obtain a color
-                // voxelColor = tFunc.getColor(val);
+//                 voxelColor = tFunc.getColor(val);
                 
                 
                 // BufferedImage expects a pixel color packed as ARGB in an int
@@ -337,7 +337,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         double max = volume.getMaximum();
         TFColor voxelColor = new TFColor();
 
-        short nSlices = 50; // Default to 50 slices
+        short nSlices = 150; // Default to 50 slices
         // My interval is upper bounded by the greatest dimension since we need
         // to respect the interval for all dimensions (assumption we make).
         double interval;
@@ -355,7 +355,9 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         interval = interval/nSlices;
         
         int maxVox = 0;
+        TFColor oldColor = new TFColor(0, 0, 0, 1);
         for (int j = 0; j < image.getHeight(); j++) {
+            oldColor = new TFColor(0, 0, 0, 1);
             for (int i = 0; i < image.getWidth(); i++) {
                 maxVox = 0;
                 
@@ -381,12 +383,14 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                     }                    
                 }
                 
-                // Map the intensity to a grey value by linear scaling
-                voxelColor.r = maxVox/max;     //* max 3000 for example value =3000 so this is the most intense voxel
-                voxelColor.g = voxelColor.r;
-                voxelColor.b = voxelColor.r;
-                voxelColor.a = maxVox > 0 ? 1.0 : 0.0;  // this makes intensity 0 completely transparent and the rest opaque
+                TFColor transferColor = tFunc.getColor(maxVox);
                 
+                /* Compute color Ci =T_{i}*c_{i} +(1 T_{i})*C_{i-1}*/
+                
+                voxelColor.r = transferColor.a * transferColor.r + (1 - transferColor.a)*oldColor.r;
+                voxelColor.g = transferColor.a * transferColor.g + (1 - transferColor.a)*oldColor.g;
+                voxelColor.b = transferColor.a * transferColor.b + (1 - transferColor.a)*oldColor.b;
+                voxelColor.a = transferColor.a;
                 
                 // BufferedImage expects a pixel color packed as ARGB in an int
                 int c_alpha = voxelColor.a <= 1.0 ? (int) Math.floor(voxelColor.a * 255) : 255;     //multiply with 255 for the color
