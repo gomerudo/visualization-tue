@@ -15,4 +15,5 @@ public class ControlOptions {
     public static final int SLICER_OPT = 1;
     public static final int MIP_OPT = 2;
     public static final int COMPOSITING_OPT = 3;
+    public static final int TF2D_OPT = 4;
 }

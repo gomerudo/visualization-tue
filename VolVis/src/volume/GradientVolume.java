@@ -4,6 +4,7 @@
  */
 package volume;
 
+import implementation.VoxelInterpolation;
 
 
 /**
@@ -53,11 +54,33 @@ public class GradientVolume {
 
     private void compute() {
 
-        // this just initializes all gradients to the vector (0,0,0)
-        for (int i=0; i<data.length; i++) {
-            data[i] = zero;
+        double xG, yG, zG;
+        double valueR, valueL;
+
+        for( int i = 0; i < volume.getDimX(); i++ ){
+            for( int j = 0; j < volume.getDimY(); j++ ){
+                for( int k = 0; k < volume.getDimZ(); k++ ){
+                    
+                    /* For x */
+                    valueL = i == 0 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i - 1, j, k}, volume);
+                    valueR = i == volume.getDimX() - 1 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i + 1, j, k}, volume);
+                    xG = (valueR - valueL)/2;
+                    
+                    /* For y */
+                    valueL = j == 0 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i, j - 1, k}, volume);
+                    valueR = j == volume.getDimY() - 1 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i, j + 1, k}, volume);
+                    yG = (valueR - valueL)/2;
+                    
+                    /* For z */
+                    valueL = k == 0 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i, j, k - 1}, volume);
+                    valueR = k == volume.getDimZ() - 1 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i, j, k + 1}, volume);
+                    zG = (valueR - valueL)/2;
+                    
+                    setGradient(i, j, k, new VoxelGradient((float)xG, (float)yG, (float)zG));
+                }
+            }
         }
-                
+        
     }
     
     public double getMaxGradientMagnitude() {
