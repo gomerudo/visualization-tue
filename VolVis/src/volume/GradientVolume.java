@@ -4,7 +4,7 @@
  */
 package volume;
 
-import implementation.VoxelInterpolation;
+import implementation.InterpolationMethods;
 
 
 /**
@@ -54,29 +54,29 @@ public class GradientVolume {
 
     private void compute() {
 
-        double xG, yG, zG;
-        double valueR, valueL;
+        float xG, yG, zG;
+        float valueR, valueL;
 
         for( int i = 0; i < volume.getDimX(); i++ ){
             for( int j = 0; j < volume.getDimY(); j++ ){
                 for( int k = 0; k < volume.getDimZ(); k++ ){
                     
                     /* For x */
-                    valueL = i == 0 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i - 1, j, k}, volume);
-                    valueR = i == volume.getDimX() - 1 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i + 1, j, k}, volume);
+                    valueL = i == 0 ? volume.getVoxel(i, j, k) : volume.getVoxel(i - 1, j, k);
+                    valueR = i == volume.getDimX() - 1 ? volume.getVoxel(i, j, k) : volume.getVoxel(i + 1, j, k);
                     xG = (valueR - valueL)/2;
                     
                     /* For y */
-                    valueL = j == 0 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i, j - 1, k}, volume);
-                    valueR = j == volume.getDimY() - 1 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i, j + 1, k}, volume);
+                    valueL = j == 0 ? volume.getVoxel(i, j, k) : volume.getVoxel(i, j - 1, k);
+                    valueR = j == volume.getDimY() - 1 ? volume.getVoxel(i, j, k) : volume.getVoxel(i, j + 1, k);
                     yG = (valueR - valueL)/2;
                     
                     /* For z */
-                    valueL = k == 0 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i, j, k - 1}, volume);
-                    valueR = k == volume.getDimZ() - 1 ? 0.0 : VoxelInterpolation.getVoxel(new double [] {i, j, k + 1}, volume);
+                    valueL = k == 0 ? volume.getVoxel(i, j, k) : volume.getVoxel(i, j, k - 1);
+                    valueR = k == volume.getDimZ() - 1 ? volume.getVoxel(i, j, k) : volume.getVoxel(i, j, k + 1);
                     zG = (valueR - valueL)/2;
                     
-                    setGradient(i, j, k, new VoxelGradient((float)xG, (float)yG, (float)zG));
+                    setGradient(i, j, k, new VoxelGradient(xG, yG, zG));
                 }
             }
         }

@@ -11,7 +11,7 @@ import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import gui.RaycastRendererPanel;
 import gui.TransferFunction2DEditor;
 import gui.TransferFunctionEditor;
-import implementation.VoxelInterpolation;
+import implementation.InterpolationMethods;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -218,7 +218,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                         + viewVec[2] * t + + volumeCenter[2] ;
                     
                     try {
-                        int val = (int)VoxelInterpolation.getVoxel(pixelCoord, volume);
+                        int val = (int)InterpolationMethods.getVoxel(pixelCoord, volume);
 
                         if (val > maxVox){
                             maxVox = val;
@@ -306,7 +306,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                         + viewVec[2] * t + + volumeCenter[2] ;
                     
                     try {
-                        int val = (int)VoxelInterpolation.getVoxel(pixelCoord, volume);
+                        int val = (int)InterpolationMethods.getVoxel(pixelCoord, volume);
                         TFColor transferColor = tFunc.getColor(val);
                         
                         voxelColor.r = oldColor.r + transferColor.a * ( transferColor.r - oldColor.r );
@@ -363,10 +363,9 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         VectorMath.setVector(volumeCenter, volume.getDimX() / 2, volume.getDimY() / 2, volume.getDimZ() / 2);
 
         // sample on a plane through the origin of the volume data
-        double max = volume.getMaximum();
         TFColor voxelColor = new TFColor();
 
-        short nSlices = 150; // Default to 50 slices
+        short nSlices = 200; // Default to 50 slices
         // My interval is upper bounded by the greatest dimension since we need
         // to respect the interval for all dimensions (assumption we make).
         
@@ -379,8 +378,11 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         double interval = Math.sqrt( Math.pow(allDimensions.get(2), 2) + Math.pow(allDimensions.get(1), 2) ) / nSlices;
         double r = tfEditor2D.triangleWidget.radius;
         short fv = tfEditor2D.triangleWidget.baseIntensity;
+        double threshold = tfEditor2D.triangleWidget.threshold;
+        System.out.println("Using t: " + threshold);
         TFColor transferColor = tfEditor2D.triangleWidget.color;
         TFColor oldColor = new TFColor(0, 0, 0, 1);
+        double minMag = 10;
         
         for (int j = 0; j < image.getHeight(); j++) {
             for (int i = 0; i < image.getWidth(); i++) {
@@ -396,27 +398,31 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                     
                     
                     try {
-                        int fx = (int)getVoxel(pixelCoord);
+                        int fx = (int)InterpolationMethods.getVoxel(pixelCoord, volume);
                         
-                        float gradMag = gradients.getGradient((int)Math.floor(pixelCoord[0]), (int)Math.floor(pixelCoord[1]), (int)Math.floor(pixelCoord[2])).mag;
-                        
-                        double alpha;
-                        if( gradMag == 0 && fx == fv ){
-                            alpha = 1;
-                        } else if( gradMag > 0  && (fx  - r*gradMag) <= fv  &&  fv <=  (fx  + r*gradMag) ){
-                            alpha = 1 - (1/r) * Math.abs( ((double)fv - (double)fx)/(double)gradMag );
-                        }   
-                        else{
-                            alpha = 0;
-                        }
+                        float gradMagInter = InterpolationMethods.getGradient(pixelCoord, gradients).mag;
+//                        if( gradMagInter >= minMag){
+                            double alpha;
+                            if( gradMagInter == 0 && fx == fv && gradMagInter >= threshold ){
+                                alpha = 1;
+                            } else if( gradMagInter > 0  && (fx  - r*gradMagInter) <= fv  && 
+                                    fv <=  (fx  + r*gradMagInter) 
+                                    && gradMagInter >= threshold
+                                    ){
+                                alpha = 1 - (1/r) * Math.abs( ((double)fv - (double)fx)/(double)gradMagInter );
+                            }   
+                            else{
+                                alpha = 0;
+                            }
+                            
+                            voxelColor.r = oldColor.r + alpha * ( transferColor.r - oldColor.r );
+                            voxelColor.g = oldColor.g + alpha * ( transferColor.g - oldColor.g );
+                            voxelColor.b = oldColor.b + alpha * ( transferColor.b - oldColor.b );
 
-                        voxelColor.r = oldColor.r + alpha * ( transferColor.r - oldColor.r );
-                        voxelColor.g = oldColor.g + alpha * ( transferColor.g - oldColor.g );
-                        voxelColor.b = oldColor.b + alpha * ( transferColor.b - oldColor.b );
-                        
-                        oldColor.r = voxelColor.r;
-                        oldColor.g = voxelColor.g;
-                        oldColor.b = voxelColor.b;
+                            oldColor.r = voxelColor.r;
+                            oldColor.g = voxelColor.g;
+                            oldColor.b = voxelColor.b;
+//                        }
 
                     } catch (ArrayIndexOutOfBoundsException ex ){
                         /* If a voxel is out of bounds (meaning that we are going outside the limits, then we 
