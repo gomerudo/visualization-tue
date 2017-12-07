@@ -86,7 +86,8 @@ public class TransferFunction2DEditor extends javax.swing.JPanel {
     public void setSelectedInfo() {
         intensityLabel.setText(Integer.toString(triangleWidget.baseIntensity));
         radiusLabel.setText(String.format("%.3f", triangleWidget.radius));
-        threshold.setText(String.format("%.1f", triangleWidget.threshold));
+        minThreshold.setText(String.format("%.1f", triangleWidget.minThreshold));
+        maxThreshold.setText(String.format("%.1f", triangleWidget.maxThreshold));
         opacityLabel.setText(String.format("%.1f", triangleWidget.color.a));
         colorButton.setBackground(new Color((float) triangleWidget.color.r, (float) triangleWidget.color.g, (float) triangleWidget.color.b));
     }
@@ -117,7 +118,9 @@ public class TransferFunction2DEditor extends javax.swing.JPanel {
         intensityLabel = new javax.swing.JTextField();
         radiusLabel = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
-        threshold = new javax.swing.JTextField();
+        maxThreshold = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        minThreshold = new javax.swing.JTextField();
 
         javax.swing.GroupLayout plotPanelLayout = new javax.swing.GroupLayout(plotPanel);
         plotPanel.setLayout(plotPanelLayout);
@@ -179,12 +182,23 @@ public class TransferFunction2DEditor extends javax.swing.JPanel {
         radiusLabel.setText("jTextField3");
         radiusLabel.setMinimumSize(new java.awt.Dimension(84, 28));
 
-        jLabel8.setText("Threshold");
+        jLabel8.setText("Max Gradient:");
 
-        threshold.setText("jTextField1");
-        threshold.addActionListener(new java.awt.event.ActionListener() {
+        maxThreshold.setText("jTextField1");
+        maxThreshold.setMinimumSize(new java.awt.Dimension(84, 24));
+        maxThreshold.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                thresholdActionPerformed(evt);
+                maxThresholdActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setText("Min Gradient:");
+
+        minThreshold.setText("jTextField1");
+        minThreshold.setMinimumSize(new java.awt.Dimension(84, 24));
+        minThreshold.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                minThresholdActionPerformed(evt);
             }
         });
 
@@ -216,27 +230,31 @@ public class TransferFunction2DEditor extends javax.swing.JPanel {
                                     .addComponent(intensityLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addComponent(colorButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 73, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(radiusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(130, 130, 130))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel3)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(labelMaxVal))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel8)
+                                .addComponent(jLabel3)
+                                .addGap(156, 156, 156)
+                                .addComponent(labelMaxVal))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel9)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(threshold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 0, Short.MAX_VALUE)))
-                                .addContainerGap())))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(plotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                                        .addComponent(minThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(jLabel8)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(jLabel7)
+                                                .addGap(51, 51, 51)))
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(maxThreshold, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
+                                            .addComponent(radiusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addGap(71, 71, 71))))
+                    .addComponent(plotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -268,11 +286,14 @@ public class TransferFunction2DEditor extends javax.swing.JPanel {
                     .addComponent(jLabel5)
                     .addComponent(opacityLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8)
-                    .addComponent(threshold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(maxThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(colorButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel9)
+                        .addComponent(minThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -306,36 +327,46 @@ public class TransferFunction2DEditor extends javax.swing.JPanel {
         changed();
     }//GEN-LAST:event_opacityLabelActionPerformed
 
-    private void thresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_thresholdActionPerformed
+    private void maxThresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxThresholdActionPerformed
         try {
-            double value = Double.parseDouble(threshold.getText());
-            if (value < 0) {
+            double value = Double.parseDouble(maxThreshold.getText());
+            if (value < triangleWidget.minThreshold || value > maxGradientMagnitude) {
+                value = maxGradientMagnitude;
+            } 
+            triangleWidget.maxThreshold = value;
+        } catch (NumberFormatException e) {
+            triangleWidget.maxThreshold = maxGradientMagnitude;
+        }
+        changed();
+    }//GEN-LAST:event_maxThresholdActionPerformed
+
+    private void minThresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minThresholdActionPerformed
+        try {
+            double value = Double.parseDouble(minThreshold.getText());
+            if (value < 0 || value > triangleWidget.maxThreshold) {
                 value = 0;
             } 
-            if (value > maxGradientMagnitude) {
-                value = maxGradientMagnitude;
-            }
-            triangleWidget.threshold = value;
+            triangleWidget.minThreshold = value;
         } catch (NumberFormatException e) {
-            triangleWidget.threshold = maxGradientMagnitude/3;
+            triangleWidget.minThreshold = 0;
         }
-        System.out.println("In threshold");
-//        setSelectedInfo();
         changed();
-    }//GEN-LAST:event_thresholdActionPerformed
+    }//GEN-LAST:event_minThresholdActionPerformed
 
     public class TriangleWidget {
 
         public short baseIntensity;
         public double radius;
         public TFColor color;
-        public double threshold;
+        public double minThreshold;
+        public double maxThreshold;
 
         public TriangleWidget(short base, double r) {
             this.baseIntensity = base;
             this.radius = r;
             this.color = new TFColor(0.0, 204.0/255.0, 153.0/255.0, 0.3);
-            this.threshold = maxGradientMagnitude/3;
+            this.minThreshold = 0;
+            this.maxThreshold = maxGradientMagnitude;
         }
         
     }
@@ -351,13 +382,15 @@ public class TransferFunction2DEditor extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel labelGradMax;
     private javax.swing.JLabel labelGradMin;
     private javax.swing.JLabel labelMaxVal;
     private javax.swing.JLabel labelMinVal;
+    private javax.swing.JTextField maxThreshold;
+    private javax.swing.JTextField minThreshold;
     private javax.swing.JTextField opacityLabel;
     private javax.swing.JPanel plotPanel;
     private javax.swing.JTextField radiusLabel;
-    private javax.swing.JTextField threshold;
     // End of variables declaration//GEN-END:variables
 }

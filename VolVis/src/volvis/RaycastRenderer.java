@@ -21,6 +21,7 @@ import util.TFChangeListener;
 import util.VectorMath;
 import volume.GradientVolume;
 import volume.Volume;
+import volume.VoxelGradient;
 
 /**
  *
@@ -190,7 +191,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         double max = volume.getMaximum();
         TFColor voxelColor = new TFColor();
 
-        short nSlices = 50; // Default to 50 slices
+//        short nSlices = 50; // Default to 50 slices
         
         // My interval is upper bounded by the greatest dimension since we need
         // to respect the interval for all dimensions (assumption we make).
@@ -200,7 +201,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         allDimensions.add(volume.getDimZ());
         Collections.sort(allDimensions);
         
-        double interval = Math.sqrt( Math.pow(allDimensions.get(2), 2) + Math.pow(allDimensions.get(1), 2) ) / nSlices;
+        double interval = Math.sqrt( Math.pow(allDimensions.get(2), 2) + Math.pow(allDimensions.get(1), 2) ) / ControlOptions.N_SLICES;
         
         
         int maxVox = 0;
@@ -208,7 +209,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
             for (int i = 0; i < image.getWidth(); i++) {
                 maxVox = 0;
                 
-                for (double t = interval*(nSlices/-2); t <= interval*(nSlices/2) ; t=t+interval ){
+                for (double t = interval*(ControlOptions.N_SLICES/-2); t <= interval*(ControlOptions.N_SLICES/2) ; t=t+interval ){
                     
                     pixelCoord[0] = uVec[0] * (i - imageCenter) + vVec[0] * (j - imageCenter)
                         + viewVec[0] * t + volumeCenter[0];
@@ -280,7 +281,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         double max = volume.getMaximum();
         TFColor voxelColor = new TFColor();
 
-        short nSlices = 150; // Default to 50 slices
+//        short nSlices = 150; // Default to 50 slices
         // My interval is upper bounded by the greatest dimension since we need
         // to respect the interval for all dimensions (assumption we make).
         
@@ -290,13 +291,13 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         allDimensions.add(volume.getDimZ());
         Collections.sort(allDimensions);
         
-        double interval = Math.sqrt( Math.pow(allDimensions.get(2), 2) + Math.pow(allDimensions.get(1), 2) ) / nSlices;
+        double interval = Math.sqrt( Math.pow(allDimensions.get(2), 2) + Math.pow(allDimensions.get(1), 2) ) / ControlOptions.N_SLICES;
         
-        TFColor oldColor = new TFColor(1, 1, 1, 1);
+        TFColor oldColor = TFColor.getWhiteBackground();
         for (int j = 0; j < image.getHeight(); j++) {
             for (int i = 0; i < image.getWidth(); i++) {
-                oldColor = new TFColor(1, 1, 1, 1);
-                for (double t = interval*(nSlices/-2); t <= interval*(nSlices/2) ; t=t+interval ){
+                oldColor.toWhiteBackground();
+                for (double t = interval*(ControlOptions.N_SLICES/-2); t <= interval*(ControlOptions.N_SLICES/2) ; t=t+interval ){
                     
                     pixelCoord[0] = uVec[0] * (i - imageCenter) + vVec[0] * (j - imageCenter)
                         + viewVec[0] * t + volumeCenter[0];
@@ -340,11 +341,11 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
     void levoys(double[] viewMatrix) {
 
         // clear image
-        for (int j = 0; j < image.getHeight(); j++) {
-            for (int i = 0; i < image.getWidth(); i++) {
-                image.setRGB(i, j, 0);
-            }
-        }
+//        for (int j = 0; j < image.getHeight(); j++) {
+//            for (int i = 0; i < image.getWidth(); i++) {
+//                image.setRGB(i, j, 0);
+//            }
+//        }
 
         // vector uVec and vVec define a plane through the origin, 
         // perpendicular to the view vector viewVec
@@ -362,12 +363,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         double[] volumeCenter = new double[3];
         VectorMath.setVector(volumeCenter, volume.getDimX() / 2, volume.getDimY() / 2, volume.getDimZ() / 2);
 
-        // sample on a plane through the origin of the volume data
         TFColor voxelColor = new TFColor();
-
-        short nSlices = 200; // Default to 50 slices
-        // My interval is upper bounded by the greatest dimension since we need
-        // to respect the interval for all dimensions (assumption we make).
         
         List<Integer> allDimensions = new LinkedList<Integer>();
         allDimensions.add(volume.getDimX());
@@ -375,19 +371,23 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         allDimensions.add(volume.getDimZ());
         Collections.sort(allDimensions);
         
-        double interval = Math.sqrt( Math.pow(allDimensions.get(2), 2) + Math.pow(allDimensions.get(1), 2) ) / nSlices;
+        double interval = Math.sqrt( Math.pow(allDimensions.get(2), 2) + Math.pow(allDimensions.get(1), 2) ) / ControlOptions.N_SLICES;
         double r = tfEditor2D.triangleWidget.radius;
         short fv = tfEditor2D.triangleWidget.baseIntensity;
-        double threshold = tfEditor2D.triangleWidget.threshold;
-        System.out.println("Using t: " + threshold);
+        double minThreshold = tfEditor2D.triangleWidget.minThreshold;
+        double maxThreshold = tfEditor2D.triangleWidget.maxThreshold;
+        
+        System.out.println("Using tmin: " + minThreshold);
+        System.out.println("Using tmax: " + maxThreshold);
+        
         TFColor transferColor = tfEditor2D.triangleWidget.color;
-        TFColor oldColor = new TFColor(0, 0, 0, 1);
-        double minMag = 10;
+//        TFColor oldColor = TFColor.getBlackBackground();
+        double [] shade = new double [3];
         
         for (int j = 0; j < image.getHeight(); j++) {
             for (int i = 0; i < image.getWidth(); i++) {
-                oldColor = new TFColor(0, 0, 0, 1);
-                for (double t = interval*(nSlices/-2); t <= interval*(nSlices/2) ; t=t+interval ){
+                voxelColor.toBlackBackground();
+                for (double t = interval*(ControlOptions.N_SLICES/-2); t <= interval*(ControlOptions.N_SLICES/2) ; t=t+interval ){
                     
                     pixelCoord[0] = uVec[0] * (i - imageCenter) + vVec[0] * (j - imageCenter)
                         + viewVec[0] * t + volumeCenter[0];
@@ -400,29 +400,37 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                     try {
                         int fx = (int)InterpolationMethods.getVoxel(pixelCoord, volume);
                         
-                        float gradMagInter = InterpolationMethods.getGradient(pixelCoord, gradients).mag;
-//                        if( gradMagInter >= minMag){
-                            double alpha;
-                            if( gradMagInter == 0 && fx == fv && gradMagInter >= threshold ){
-                                alpha = 1;
-                            } else if( gradMagInter > 0  && (fx  - r*gradMagInter) <= fv  && 
-                                    fv <=  (fx  + r*gradMagInter) 
-                                    && gradMagInter >= threshold
-                                    ){
-                                alpha = 1 - (1/r) * Math.abs( ((double)fv - (double)fx)/(double)gradMagInter );
-                            }   
-                            else{
-                                alpha = 0;
-                            }
-                            
-                            voxelColor.r = oldColor.r + alpha * ( transferColor.r - oldColor.r );
-                            voxelColor.g = oldColor.g + alpha * ( transferColor.g - oldColor.g );
-                            voxelColor.b = oldColor.b + alpha * ( transferColor.b - oldColor.b );
+                        VoxelGradient gradInter = InterpolationMethods.getGradient(pixelCoord, gradients);
+                        float gradMagInter = gradInter.mag;
+                        double alpha;
+                        if( gradMagInter == 0 && fx == fv && gradMagInter >= minThreshold && gradMagInter <= maxThreshold ){
+                            alpha = 1;
+                        } else if( gradMagInter > 0  && (fx  - r*gradMagInter) <= fv  && 
+                                fv <=  (fx  + r*gradMagInter) 
+                                && gradMagInter >= minThreshold && gradMagInter <= maxThreshold
+                                ){
+                            alpha = 1 - (1/r) * Math.abs( ((double)fv - (double)fx)/(double)gradMagInter );
+                        }   
+                        else{
+                            alpha = 0;
+                        }
 
-                            oldColor.r = voxelColor.r;
-                            oldColor.g = voxelColor.g;
-                            oldColor.b = voxelColor.b;
-//                        }
+                        if (ControlOptions.SHADDING) {
+                            shade = getShade(viewMatrix, pixelCoord, transferColor, gradInter);
+                        } else {
+                            shade[0] = transferColor.r;
+                            shade[1] = transferColor.g;
+                            shade[2] = transferColor.b;
+                        }
+
+
+                        voxelColor.r = voxelColor.r + alpha * ( shade[0] - voxelColor.r );
+                        voxelColor.g = voxelColor.g + alpha * ( shade[1] - voxelColor.g );
+                        voxelColor.b = voxelColor.b + alpha * ( shade[2] - voxelColor.b );
+
+//                        oldColor.r = voxelColor.r;
+//                        oldColor.g = voxelColor.g;
+//                        oldColor.b = voxelColor.b;
 
                     } catch (ArrayIndexOutOfBoundsException ex ){
                         /* If a voxel is out of bounds (meaning that we are going outside the limits, then we 
@@ -443,6 +451,70 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
 
     }
 
+    public double [] getShade(double[] viewMatrix, double[] coord, TFColor iDiff, VoxelGradient gradient) {
+        double[] N = new double[3];
+        
+//        VoxelGradient gradient = InterpolationMethods.getGradient(coord, gradients);
+        VectorMath.setVector(N, gradient.x / gradient.mag, gradient.y / gradient.mag, gradient.z / gradient.mag);
+
+        double[] V = new double[3];
+        VectorMath.setVector(V, -viewMatrix[2], -viewMatrix[6], -viewMatrix[10]);
+        double VLength = VectorMath.length(V);
+
+        double[] L = new double[3];
+        VectorMath.setVector(L, V[0] / VLength, V[1] / VLength, V[2] / VLength);
+        
+        double[] H = new double[3];
+        VectorMath.setVector(H, 2*L[0], 2*L[1], 2*L[2]);
+
+        double HLength = VectorMath.length(H);
+        VectorMath.setVector(H, H[0] / HLength, H[1] / HLength, H[2] / HLength);
+
+        double iAmb = 1; // white light
+        double kAmb = 0.1;
+//        double iDiff = 1;
+        double kDiff = 0.7;
+        double kSpec = 0.2;
+        double alpha = 10;
+
+        double shade = 0;
+        double rShade = 0;
+        double gShade = 0;
+        double bShade = 0;
+
+        double ambTerm = iAmb * kAmb;
+        double c1 = VectorMath.dotproduct(N, L);
+        double c2 = VectorMath.dotproduct(N, H);
+//        if(c1 > 0 && c2 > 0){
+//            shade = iAmb * kAmb + iDiff * kDiff * c1 + iDiff * kSpec * Math.pow(c2, alpha);
+//        }
+//        else {
+//            shade = 1;
+//        }
+        if (ambTerm > 0) 
+            shade += ambTerm;
+        double rDiffTerm = iDiff.r * kDiff * c1;
+        double gDiffTerm = iDiff.g * kDiff * c1;
+        double bDiffTerm = iDiff.b * kDiff * c1;
+//        double diffTerm = iDiff * kDiff * (VectorMath.dotproduct(N, L));
+        if (rDiffTerm > 0)
+            rShade += rDiffTerm;   
+        if (gDiffTerm > 0)
+            gShade += gDiffTerm; 
+        if (bDiffTerm > 0)
+            bShade += bDiffTerm; 
+        double specTerm = kSpec * Math.pow(c2, alpha);
+        if (specTerm > 0){
+            rShade += specTerm;
+            gShade += specTerm;
+            bShade += specTerm;
+        }
+            
+        double [] shades = {rShade, gShade, bShade};
+        return shades;
+    }
+
+    
     private void drawBoundingBox(GL2 gl) {
         gl.glPushAttrib(GL2.GL_CURRENT_BIT);
         gl.glDisable(GL2.GL_LIGHTING);

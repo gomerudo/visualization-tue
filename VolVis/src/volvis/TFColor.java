@@ -22,6 +22,24 @@ public class TFColor {
         a = alpha;
     }
     
+    public void toWhiteBackground(){
+        r = g = b = 1;
+        a = 1;
+    }
+    
+    public void toBlackBackground(){
+        r = g = b = 0;
+        a = 1;
+    }
+    
+    public static TFColor getWhiteBackground(){
+        return new TFColor(1, 1, 1, 1);
+    }
+    
+    public static TFColor getBlackBackground(){
+        return new TFColor(0, 0, 0, 1);
+    }
+            
     @Override
     public String toString() {
         String text = "(" + r + ", " + g + ", " + b + ", " + a + ")";

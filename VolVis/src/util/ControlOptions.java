@@ -16,4 +16,9 @@ public class ControlOptions {
     public static final int MIP_OPT = 2;
     public static final int COMPOSITING_OPT = 3;
     public static final int TF2D_OPT = 4;
+    
+    public static boolean SHADDING = false;
+    
+    public static int N_SLICES = 50;
+    
 }
