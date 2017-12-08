@@ -18,6 +18,7 @@ public class ControlOptions {
     public static final int TF2D_OPT = 4;
     
     public static boolean SHADDING = false;
+    public static boolean LOW_RESOLUTION = false; // Not yet implemented
     
     public static int N_SLICES = 50;
     

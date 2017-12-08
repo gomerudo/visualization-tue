@@ -40,6 +40,13 @@ public class TFColor {
         return new TFColor(0, 0, 0, 1);
     }
             
+    public boolean isWhiteBackground(){
+        return this.r == 1 && this.g == 1 && this.b == 1;
+    }
+    
+    public boolean isBlackBackground(){
+        return this.r == 1 && this.g == 1 && this.b == 1;
+    }
     @Override
     public String toString() {
         String text = "(" + r + ", " + g + ", " + b + ", " + a + ")";

@@ -56,7 +56,7 @@ public class GradientVolume {
 
         float xG, yG, zG;
         float valueR, valueL;
-
+        
         for( int i = 0; i < volume.getDimX(); i++ ){
             for( int j = 0; j < volume.getDimY(); j++ ){
                 for( int k = 0; k < volume.getDimZ(); k++ ){
