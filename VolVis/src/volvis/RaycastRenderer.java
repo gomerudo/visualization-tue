@@ -177,7 +177,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         TFColor voxelColor = new TFColor();
         
         double interval = Math.sqrt( Math.pow(volume.getDimX(), 2) + Math.pow(volume.getDimY(), 2) + Math.pow(volume.getDimZ(), 2)) / ControlOptions.N_SLICES;
-        
+
         int maxVox = 0;
         for (int j = 0; j < image.getHeight(); j++) {
             for (int i = 0; i < image.getWidth(); i++) {
@@ -190,7 +190,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                      pixelCoord[1] = uVec[1] * (i - imageCenter) + vVec[1] * (j - imageCenter)
                         + viewVec[1] * t + volumeCenter[1] ;
                     pixelCoord[2] = uVec[2] * (i - imageCenter) + vVec[2] * (j - imageCenter)
-                        + viewVec[2] * t + + volumeCenter[2] ;
+                        + viewVec[2] * t + volumeCenter[2] ;
                     
                     try {
                         int val = (int)InterpolationMethods.getVoxel(pixelCoord, volume);
@@ -247,7 +247,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
         TFColor voxelColor = new TFColor();
         
         double interval = Math.sqrt( Math.pow(volume.getDimX(), 2) + Math.pow(volume.getDimY(), 2) + Math.pow(volume.getDimZ(), 2)) / ControlOptions.N_SLICES;
-        
+
         for (int j = 0; j < image.getHeight(); j++) {
             for (int i = 0; i < image.getWidth(); i++) {
                 voxelColor.toWhiteBackground();
@@ -258,7 +258,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                      pixelCoord[1] = uVec[1] * (i - imageCenter) + vVec[1] * (j - imageCenter)
                         + viewVec[1] * t + volumeCenter[1] ;
                     pixelCoord[2] = uVec[2] * (i - imageCenter) + vVec[2] * (j - imageCenter)
-                        + viewVec[2] * t + + volumeCenter[2] ;
+                        + viewVec[2] * t + volumeCenter[2] ;
                     
                     try {
                         int val = (int)InterpolationMethods.getVoxel(pixelCoord, volume);
@@ -348,7 +348,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                      pixelCoord[1] = uVec[1] * (i - imageCenter) + vVec[1] * (j - imageCenter)
                         + viewVec[1] * t + volumeCenter[1] ;
                     pixelCoord[2] = uVec[2] * (i - imageCenter) + vVec[2] * (j - imageCenter)
-                        + viewVec[2] * t + + volumeCenter[2] ;
+                        + viewVec[2] * t + volumeCenter[2] ;
                     
                     
                     try {
@@ -378,7 +378,6 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                     } catch (ArrayIndexOutOfBoundsException ex ){
                         /* If a voxel is out of bounds (meaning that we are going outside the limits, then we 
                         just ignore. This is possible because we take the maximum dimension as reference. */
-                        
                     }                    
                 }
                 
