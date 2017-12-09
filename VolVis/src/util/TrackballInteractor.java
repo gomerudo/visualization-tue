@@ -5,6 +5,7 @@
 package util;
 
 import com.jogamp.opengl.GL2;
+import gui.VolVisApplication;
 
 /**
  *
@@ -70,7 +71,11 @@ public class TrackballInteractor {
     }
 
     public void drag(int mx, int my) {
-
+        // If dragging the picture, then reduce the resolution to move faster
+        if(ControlOptions.LOW_RESOLUTION){
+            ControlOptions.N_SLICES = 1;
+        }
+        
         double[] curPos = new double[3];
 
         trackball_ptov(mx, my, width, height, curPos);

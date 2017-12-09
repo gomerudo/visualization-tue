@@ -105,8 +105,8 @@ public class RaycastRendererPanel extends javax.swing.JPanel {
 
         jLabel2.setText("Slices:");
 
-        lowResolution.setText("Low resolution");
-        lowResolution.setVisible(false);
+        lowResolution.setText("Increase responsiveness");
+        //lowResolution.setVisible(false);
         lowResolution.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 lowResolutionActionPerformed(evt);
@@ -204,7 +204,6 @@ public class RaycastRendererPanel extends javax.swing.JPanel {
 
     private void lowResolutionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lowResolutionActionPerformed
         ControlOptions.LOW_RESOLUTION = lowResolution.isSelected();
-        renderer.changed();
     }//GEN-LAST:event_lowResolutionActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -214,7 +213,7 @@ public class RaycastRendererPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JCheckBox lowResolution;
     private javax.swing.JRadioButton mipButton;
-    private javax.swing.JTextField nSlices;
+    public static javax.swing.JTextField nSlices;
     private javax.swing.JLabel renderingSpeedLabel;
     private javax.swing.JCheckBox shadingCheckbox;
     private javax.swing.JRadioButton slicerButton;

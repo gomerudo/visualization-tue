@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+import util.ControlOptions;
 import volume.Volume;
 import volvis.RaycastRenderer;
 import volvis.Visualization;
@@ -102,6 +103,12 @@ public class VolVisApplication extends javax.swing.JFrame {
 
         splitPane.setRightComponent(tabbedPanel);
 
+        renderPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                renderPanelMouseReleased(evt);
+            }
+        });
+
         javax.swing.GroupLayout renderPanelLayout = new javax.swing.GroupLayout(renderPanel);
         renderPanel.setLayout(renderPanelLayout);
         renderPanelLayout.setHorizontalGroup(
@@ -120,7 +127,7 @@ public class VolVisApplication extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(splitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1076, Short.MAX_VALUE)
+                .addComponent(splitPane)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -175,6 +182,11 @@ public class VolVisApplication extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_loadButtonActionPerformed
+
+    private void renderPanelMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_renderPanelMouseReleased
+        ControlOptions.N_SLICES = Integer.parseInt(RaycastRendererPanel.nSlices.getText());
+        raycastRenderer.changed();
+    }//GEN-LAST:event_renderPanelMouseReleased
 
     /**
      * @param args the command line arguments

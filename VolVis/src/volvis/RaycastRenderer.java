@@ -202,7 +202,7 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                         /* If a voxel is out of bounds (meaning that we are going outside the limits, then we 
                         just ignore. This is possible because we take the maximum dimension as reference. */
                         
-                    }                    
+                    }
                 }
                 
                 // Map the intensity to a grey value by linear scaling
@@ -359,8 +359,9 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                         double alpha = LevoysIllumination.getAlpha(gradInter, minThreshold, maxThreshold, fx, fv, r);
                         
                         // If shadding enabled, then compute shadow
-                        if (ControlOptions.SHADDING && alpha != 0) {
-                            shade = LevoysIllumination.getShade(V, L, H, pixelCoord, transferColor, gradInter);
+                        if (ControlOptions.SHADDING && alpha != 0 ) {
+                            // L = V, then no need to send both
+                            shade = LevoysIllumination.getShade(L, H, pixelCoord, transferColor, gradInter);
                         } 
                         // Otherwise, regular levoy's method
                         else {
@@ -380,7 +381,8 @@ public class RaycastRenderer extends Renderer implements TFChangeListener {
                         
                     }                    
                 }
-                             
+                
+                
                 // BufferedImage expects a pixel color packed as ARGB in an int
                 int c_alpha = 1 <= 1.0 ? (int) Math.floor(1 * 255) : 255;     //multiply with 255 for the color
                 int c_red = voxelColor.r <= 1.0 ? (int) Math.floor(voxelColor.r * 255) : 255;

@@ -5,6 +5,7 @@
  */
 package implementation;
 
+import util.ControlOptions;
 import util.VectorMath;
 import volume.VoxelGradient;
 import volvis.TFColor;
@@ -32,33 +33,40 @@ public class LevoysIllumination {
         }
     }
     
-    public static double [] getShade(double[] V, double [] L, double [] H, double[] coord, TFColor iDiff, VoxelGradient gradient) {
+    public static double [] getShade(double [] L, double [] H, double[] coord, TFColor iDiff, VoxelGradient gradient) {
         double[] N = new double[3];
         
         VectorMath.setVector(N, gradient.x / gradient.mag, gradient.y / gradient.mag, gradient.z / gradient.mag);
-
-        double iAmb = 1; // white light
-        double kAmb = 0.1;
-//        double iDiff = 1;
-        double kDiff = 0.7;
-        double kSpec = 0.2;
-        double alpha = 10;
 
         double rShade = 0;
         double gShade = 0;
         double bShade = 0;
 
-        double ambTerm = iAmb * kAmb;
+        double ambTerm = ControlOptions.I_AMB * ControlOptions.K_AMB;
         double c1 = VectorMath.dotproduct(N, L);
         double c2 = VectorMath.dotproduct(N, H);
 
-        if (ambTerm > 0) {
-            gShade = bShade = rShade += ambTerm;
+        double rDiffTerm = 0;
+        double gDiffTerm = 0;
+        double bDiffTerm = 0;
+        
+        // Formulas only apply when dot products are possitive
+        if( c1 < 0 || c2 < 0){
+            return new double []{iDiff.r, iDiff.g, iDiff.b};
         }
 
-        double rDiffTerm = iDiff.r * kDiff * c1;
-        double gDiffTerm = iDiff.g * kDiff * c1;
-        double bDiffTerm = iDiff.b * kDiff * c1;
+        // Just do computations when worth it (save runtime as much as possible)
+        if(c1 > 0 || c2 > 0){
+            double kDc1 = ControlOptions.K_DIFF * c1;
+            rDiffTerm = iDiff.r * kDc1;
+            gDiffTerm = iDiff.g * kDc1;
+            bDiffTerm = iDiff.b * kDc1;
+        }
+        
+        if (ambTerm > 0) {
+            gShade = bShade = rShade += ambTerm; // All values start with the same factor
+        }
+
         
         if (rDiffTerm > 0)
             rShade += rDiffTerm;   
@@ -66,7 +74,8 @@ public class LevoysIllumination {
             gShade += gDiffTerm; 
         if (bDiffTerm > 0)
             bShade += bDiffTerm; 
-        double specTerm = kSpec * Math.pow(c2, alpha);
+        
+        double specTerm = ControlOptions.K_SPEC * Math.pow(c2, ControlOptions.SHADE_ALPHA);
         if (specTerm > 0){
             rShade += specTerm;
             gShade += specTerm;

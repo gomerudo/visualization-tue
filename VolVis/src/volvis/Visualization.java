@@ -9,6 +9,8 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.glu.GLU;
+import gui.RaycastRendererPanel;
+import gui.VolVisApplication;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -16,6 +18,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
+import util.ControlOptions;
 import util.TFChangeListener;
 import util.TrackballInteractor;
 
@@ -60,11 +63,6 @@ public class Visualization implements GLEventListener, TFChangeListener {
         canvas.display();
     }
 
-
-
-    
-
-
    @Override
     public void init(GLAutoDrawable drawable) {
        
@@ -94,6 +92,11 @@ public class Visualization implements GLEventListener, TFChangeListener {
        if (trackball.isRotating()) {
            // when dragging the mouse, keep updating the virtual trackball
            trackball.updateTransform(gl);
+       }
+       else{
+           if(ControlOptions.LOW_RESOLUTION){
+                ControlOptions.N_SLICES = Integer.parseInt(RaycastRendererPanel.nSlices.getText());
+           }
        }
        
        // multiply the current view transform (identity) with trackball transform
