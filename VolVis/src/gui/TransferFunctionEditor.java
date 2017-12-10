@@ -57,6 +57,7 @@ public class TransferFunctionEditor extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         colorButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
 
@@ -101,15 +102,27 @@ public class TransferFunctionEditor extends javax.swing.JPanel {
             }
         });
 
+        jButton1.setText("Remove last control point");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 299, Short.MAX_VALUE)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(95, 95, 95)
+                .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 100, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .add(0, 68, Short.MAX_VALUE)
+                .add(jButton1))
         );
 
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -192,9 +205,20 @@ public class TransferFunctionEditor extends javax.swing.JPanel {
         }
 
     }//GEN-LAST:event_colorButtonActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if(tfunc.getControlPoints() != null && tfunc.getControlPoints().size() > 2){
+            tfunc.removeControlPoint(tfunc.getControlPoints().size() - 2);
+            tfunc.changed();
+            tfView.repaint();
+        }
+            
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton colorButton;
     private javax.swing.JPanel histogramPanel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
