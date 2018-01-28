@@ -22,9 +22,9 @@ library(tidyr)
 # Assume we are working in the same directory where the script resides in
 DIR_RELATIVE_PATH <- 'datasets/genderstats'
 
-filesIdsS <- c("3", "4", "5", "6", "8a", "8b", "8c", "10", "20")
+filesIdsS <- c("3", "5", "8a", "8b", "8c", "20")
 
-filesIdsNS <- c("24a", "24b", "24c", "25")
+filesIdsNS <- c("24a", "24b", "24c")
 
 
 bySexSet <- NULL
@@ -40,22 +40,15 @@ processFilesWithBySex <- function(){
        names(currentFile)[1] <- "Indicator"
        names(currentFile)[3] <- "CountryCode"
        cleanFile <- select(currentFile, Indicator, Region, CountryCode, Country, Year, Sex, Value)
-       #cleanFile <- cleanFile %>%
-       #cleanFile <- group_by(cleanFile, Indicator, Country, Year)
-       #cleanFile <- aggregate(state.x77, list(Region = state.region), mean)
-       #  mutate(prop = Value[Sex=="Male"] )
-        #mutate(prop = 1)
-       #aggregate(cleanFile, list(as.factor(cleanFile$Indicator), as.factor(cleanFile$Country), as.factor(cleanFile$Indicator)), FUN= mean)
-       #cleanFile <- aggregate(. ~ Indicator + Country, cleanFile, mean)
-       # Combining all data
-       # View(cleanFile, fileId)
+       
        if( is.null(bySexSet) ){
          bySexSet <<- cleanFile
        }else{
          bySexSet <<- bind_rows(bySexSet, cleanFile)
        }
   }
-  writeToCsv(bySexSet, "GenderStatisticsBySex")
+  getRatio()
+  #writeToCsv(bySexSet, "GenderStatisticsBySex")
 }
 
 ################################################################################
@@ -71,19 +64,48 @@ processFilesWithoutBySex <- function(){
     cleanFile <- select(currentFile, Indicator, Region, CountryCode, Country, Year, Sex, Value)
     
     # Combining all data
-    # View(cleanFile, fileId)
     if( is.null(noSexSet) ){
       noSexSet <<- cleanFile
     }else{
       noSexSet <<- bind_rows(noSexSet, cleanFile)
     }
   }
-  writeToCsv(noSexSet, "GenderStatisticsFemaleOnly")
+  getRatioFake()
+  #writeToCsv(noSexSet, "GenderStatisticsParity")
 }
+
+getRatio <- function(){
+  bySexSet <<- bySexSet %>% 
+    group_by(Indicator, Country, Year)
+  
+  bySexSet <<- bySexSet[
+    with(bySexSet, order(Indicator, Country, Year, Sex)),
+    ]
+  bySexSet <<- bySexSet %>% 
+      mutate(SexRatio = customProportion(Value))
+}
+
+getRatioFake <- function(){
+  noSexSet <<- noSexSet %>% 
+    mutate(SexRatio = 1)
+}
+
+
+customProportion <- function(dataset){
+  return(dataset[2] / dataset[3])
+}
+
 
 
 # Write the final dataset
 writeToCsv <- function(dataset, fileName) {
   path <- str_c(DIR_RELATIVE_PATH, "/", fileName, ".csv")
   write.csv(dataset, path, row.names = FALSE)
+}
+
+main <- function(){
+  processFilesWithBySex()
+  processFilesWithoutBySex()
+  jointSet <- bind_rows(bySexSet, noSexSet)
+  writeToCsv(jointSet, "GenderStatisticsBySex")
 }
