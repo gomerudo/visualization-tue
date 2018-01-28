@@ -1,5 +1,6 @@
 ################################################################################
-# Author: Jorge Gomez (j.gomez.robles@student.tue.nl)
+# Authors: Jorge Gomez (j.gomez.robles@student.tue.nl)
+#          A. Siganos (a.siganos@student.tue.nl)
 ################################################################################
 
 ################################################################################
@@ -31,7 +32,7 @@ bySexSet <- NULL
 noSexSet <- NULL
 
 ################################################################################
-############################# DEFINE MAIN FUNCTION #############################
+########################## FUNCTION FOR DATA WITH SEX ##########################
 ################################################################################
 processFilesWithBySex <- function(){
   for(fileId in filesIdsS){
@@ -52,7 +53,7 @@ processFilesWithBySex <- function(){
 }
 
 ################################################################################
-############################# DEFINE MAIN FUNCTION #############################
+########################  FUNCTION FOR DATA WITH NO SEX ########################
 ################################################################################
 processFilesWithoutBySex <- function(){
   for(fileId in filesIdsNS){
@@ -74,6 +75,9 @@ processFilesWithoutBySex <- function(){
   #writeToCsv(noSexSet, "GenderStatisticsParity")
 }
 
+################################################################################
+#################  FUNCTION TO GET RATIO DEPENDING ON THE DATA #################
+################################################################################
 getRatio <- function(){
   bySexSet <<- bySexSet %>% 
     group_by(Indicator, Country, Year)
@@ -85,24 +89,35 @@ getRatio <- function(){
       mutate(SexRatio = customProportion(Value))
 }
 
+################################################################################
+################################ FAKE RATIO (1) ################################
+################################################################################
+
 getRatioFake <- function(){
   noSexSet <<- noSexSet %>% 
     mutate(SexRatio = 1)
 }
 
-
+################################################################################
+####################### CALCULATE PROPORTION (SEX RATIO) #######################
+################################################################################
 customProportion <- function(dataset){
   return(dataset[2] / dataset[3])
 }
 
 
 
-# Write the final dataset
+################################################################################
+##############################  WRITE TO CSV FILE ##############################
+################################################################################
 writeToCsv <- function(dataset, fileName) {
   path <- str_c(DIR_RELATIVE_PATH, "/", fileName, ".csv")
   write.csv(dataset, path, row.names = FALSE)
 }
 
+################################################################################
+############################# DEFINE MAIN FUNCTION #############################
+################################################################################
 main <- function(){
   processFilesWithBySex()
   processFilesWithoutBySex()
